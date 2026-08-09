@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #22242f transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #22242f;
+    border-radius: 999px;
+  }
+
+  /* Respect reduced-motion preference across the whole app */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Glassmorphism panel - the base surface used across the app */
+  .glass {
+    @apply bg-surface/60 backdrop-blur-xl border border-white/[0.06];
+  }
+
+  .glass-hi {
+    @apply bg-surface-hi/70 backdrop-blur-xl border border-white/[0.08];
+  }
+
+  /* Gradient text used for the Bholu wordmark + key headline moments */
+  .text-gradient {
+    @apply bg-bholu-gradient bg-clip-text text-transparent;
+  }
+
+  /* Focus ring - consistent, visible, accessible */
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-accent-1/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base;
+  }
+}
+
+/* Lightweight inverted palette for the theme toggle. Bholu is designed
+   dark-first; this keeps light mode readable without a second design
+   system. */
+html.light body {
+  background-color: #F4F5F8;
+  color: #16181F;
+}
+html.light .glass,
+html.light .glass-hi {
+  background-color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+html.light .text-ink-hi { color: #16181F; }
+html.light .text-ink-lo { color: #5B5F70; }
+html.light .bg-base { background-color: #F4F5F8; }
+
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.45); }
+  50% { box-shadow: 0 0 0 8px rgba(124, 92, 252, 0); }
+}
+.orb-pulse {
+  animation: orb-pulse 2s ease-in-out infinite;
+}
