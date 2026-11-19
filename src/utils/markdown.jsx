@@ -1,16 +1,6 @@
-/**
- * Minimal markdown renderer for chat messages.
- *
- * Deliberately NOT using react-markdown + remark/rehype plugins here -
- * that stack pulls in a surprising number of transitive dependencies for
- * what Bholu's answers actually need: bold, italics, inline code, fenced
- * code blocks, links, and bullet lists. This keeps the bundle small per
- * the brief's "no unnecessary heavy libraries" rule.
- */
 import React from "react";
 
 function renderInline(text, keyPrefix) {
-  // Order matters: code spans first so ** inside `code` isn't touched.
   const parts = [];
   let remaining = text;
   let i = 0;
@@ -29,13 +19,16 @@ function renderInline(text, keyPrefix) {
     const token = match[0];
     if (token.startsWith("`")) {
       parts.push(
-        <code key={`${keyPrefix}-${i++}`} className="bg-white/10 text-accent-2 px-1.5 py-0.5 rounded font-mono text-[0.85em]">
+        <code
+          key={`${keyPrefix}-${i++}`}
+          className="bg-stone/90 text-gold-light border border-line px-1.5 py-0.5 rounded font-mono text-[0.85em]"
+        >
           {token.slice(1, -1)}
         </code>
       );
     } else if (token.startsWith("**")) {
       parts.push(
-        <strong key={`${keyPrefix}-${i++}`} className="font-semibold text-ink-hi">
+        <strong key={`${keyPrefix}-${i++}`} className="font-semibold text-parchment">
           {token.slice(2, -2)}
         </strong>
       );
@@ -47,14 +40,14 @@ function renderInline(text, keyPrefix) {
           href={linkMatch[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-accent-2 underline underline-offset-2 hover:text-accent-1 transition-colors"
+          className="text-gold underline underline-offset-2 hover:text-gold-bright transition-colors"
         >
           {linkMatch[1]}
         </a>
       );
     } else {
       parts.push(
-        <em key={`${keyPrefix}-${i++}`} className="italic text-ink-hi">
+        <em key={`${keyPrefix}-${i++}`} className="italic text-parchment">
           {token.slice(1, -1)}
         </em>
       );
@@ -76,16 +69,16 @@ export function renderMarkdown(text, onCopy) {
       const lang = firstNewline > -1 ? block.slice(0, firstNewline).trim() : "";
       const code = firstNewline > -1 ? block.slice(firstNewline + 1) : block;
       nodes.push(
-        <div key={`code-${blockIdx}`} className="relative my-2 group">
-          <pre className="bg-black/40 border border-line rounded-lg p-3 overflow-x-auto font-mono text-sm text-ink-hi">
-            {lang && <div className="text-xs text-ink-lo mb-1">{lang}</div>}
+        <div key={`code-${blockIdx}`} className="relative my-2.5 group">
+          <pre className="bg-midnight/95 border border-line rounded-xl p-3.5 overflow-x-auto font-mono text-xs text-parchment">
+            {lang && <div className="text-[10px] text-gold-light font-mono mb-1">{lang}</div>}
             <code>{code.trim()}</code>
           </pre>
           {onCopy && (
             <button
               onClick={() => onCopy(code.trim())}
-              className="absolute top-2 right-2 text-xs text-ink-lo opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded bg-white/5 hover:bg-white/10 focus-ring"
-              aria-label="Copy code"
+              className="absolute top-2.5 right-2.5 text-[11px] font-mono text-parchment-faint hover:text-gold transition-colors px-2 py-0.5 rounded bg-chamber border border-line focus-ring"
+              aria-label="Copy code snippet"
             >
               Copy
             </button>
@@ -95,16 +88,15 @@ export function renderMarkdown(text, onCopy) {
       return;
     }
 
-    // Non-code block: split into lines for bullet/paragraph handling
     const lines = block.split("\n").filter((l) => l.trim().length > 0);
     let listBuffer = [];
 
     const flushList = (idx) => {
       if (listBuffer.length === 0) return;
       nodes.push(
-        <ul key={`list-${blockIdx}-${idx}`} className="list-disc list-inside space-y-1 my-1">
+        <ul key={`list-${blockIdx}-${idx}`} className="list-disc list-inside space-y-1 my-1.5 text-parchment/90">
           {listBuffer.map((item, i) => (
-            <li key={i} className="text-sm leading-relaxed">
+            <li key={i} className="text-xs sm:text-sm leading-relaxed">
               {renderInline(item, `li-${blockIdx}-${idx}-${i}`)}
             </li>
           ))}
@@ -114,13 +106,25 @@ export function renderMarkdown(text, onCopy) {
     };
 
     lines.forEach((line, idx) => {
+      // Check for headings
+      const headingMatch = line.match(/^(#{1,3})\s+(.*)/);
+      if (headingMatch) {
+        flushList(idx);
+        nodes.push(
+          <h4 key={`h-${blockIdx}-${idx}`} className="font-cinzel text-sm sm:text-base font-bold text-gold mt-3 mb-1">
+            {renderInline(headingMatch[2], `h-${blockIdx}-${idx}`)}
+          </h4>
+        );
+        return;
+      }
+
       const bulletMatch = line.match(/^[-•*]\s+(.*)/);
       if (bulletMatch) {
         listBuffer.push(bulletMatch[1]);
       } else {
         flushList(idx);
         nodes.push(
-          <p key={`p-${blockIdx}-${idx}`} className="text-sm leading-relaxed">
+          <p key={`p-${blockIdx}-${idx}`} className="text-xs sm:text-sm leading-relaxed text-parchment/90">
             {renderInline(line, `p-${blockIdx}-${idx}`)}
           </p>
         );
@@ -129,5 +133,5 @@ export function renderMarkdown(text, onCopy) {
     flushList("end");
   });
 
-  return <div className="space-y-1.5">{nodes}</div>;
+  return <div className="space-y-2">{nodes}</div>;
 }

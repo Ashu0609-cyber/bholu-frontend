@@ -32,13 +32,48 @@ export const getResume = () => api.get("/resume").then((r) => r.data?.data ?? r.
 export const getStats = () => api.get("/stats").then((r) => r.data?.data ?? r.data);
 
 /**
- * POST /chat - only ever called when the user actually submits a message.
- * Never called on page load, on section open, or on a timer.
+ * POST /chat - extracts the clean conversational text from any response shape.
+ * Never allows raw JSON objects to leak through to the UI.
  */
 export const postChat = (message, sessionId) =>
   api
     .post("/chat", { message, session_id: sessionId || undefined })
-    .then((r) => r.data?.data ?? r.data);
+    .then((r) => {
+      const payload = r.data;
+      let text = "";
+      let sid = sessionId;
+
+      if (typeof payload === "string") {
+        text = payload;
+      } else if (payload?.data?.response) {
+        text = payload.data.response;
+        sid = payload.data.session_id || sid;
+      } else if (payload?.data?.answer) {
+        text = payload.data.answer;
+        sid = payload.data.session_id || sid;
+      } else if (payload?.response) {
+        text = payload.response;
+        sid = payload.session_id || sid;
+      } else if (payload?.answer) {
+        text = payload.answer;
+        sid = payload.session_id || sid;
+      } else {
+        text = typeof payload === "object" ? JSON.stringify(payload) : String(payload);
+      }
+
+      // If text itself is a JSON string e.g. {"answer": "...", "status": "success"}
+      if (typeof text === "string" && text.trim().startsWith("{") && text.trim().endsWith("}")) {
+        try {
+          const parsed = JSON.parse(text.trim());
+          if (parsed.answer) text = parsed.answer;
+          else if (parsed.response) text = parsed.response;
+          else if (parsed.data?.response) text = parsed.data.response;
+          else if (parsed.data?.answer) text = parsed.data.answer;
+        } catch (e) {}
+      }
+
+      return { response: text, answer: text, session_id: sid };
+    });
 
 /** POST /feedback */
 export const postFeedback = (question, response, rating) =>

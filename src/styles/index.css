@@ -3,70 +3,85 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #22242f transparent;
-  }
-  *::-webkit-scrollbar {
-    width: 6px;
-  }
-  *::-webkit-scrollbar-thumb {
-    background: #22242f;
-    border-radius: 999px;
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
-  /* Respect reduced-motion preference across the whole app */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
+  body {
+    background-color: #0B0F19;
+    color: #F4EEDD;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Custom antique scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #060911;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #192235;
+    border-radius: 4px;
+    border: 1px solid rgba(197, 160, 89, 0.2);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C5A059;
   }
 }
 
 @layer components {
-  /* Glassmorphism panel - the base surface used across the app */
-  .glass {
-    @apply bg-surface/60 backdrop-blur-xl border border-white/[0.06];
+  /* Gilded dark glass card */
+  .glass-gilded {
+    background: linear-gradient(145deg, rgba(18, 24, 38, 0.85) 0%, rgba(11, 15, 25, 0.92) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(197, 160, 89, 0.16);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(197, 160, 89, 0.1);
   }
 
-  .glass-hi {
-    @apply bg-surface-hi/70 backdrop-blur-xl border border-white/[0.08];
+  .glass-gilded:hover {
+    border-color: rgba(197, 160, 89, 0.35);
   }
 
-  /* Gradient text used for the Bholu wordmark + key headline moments */
-  .text-gradient {
-    @apply bg-bholu-gradient bg-clip-text text-transparent;
+  /* Subtle Slytherin emerald accent border on select items */
+  .border-slytherin-subtle {
+    border-color: rgba(45, 106, 79, 0.35);
   }
 
-  /* Focus ring - consistent, visible, accessible */
+  .border-slytherin-subtle:hover {
+    border-color: rgba(82, 183, 136, 0.55);
+    box-shadow: 0 0 15px rgba(45, 106, 79, 0.25);
+  }
+
+  /* Gilded text gradient */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #F3E5AB 0%, #C5A059 50%, #E5C158 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Focus ring for accessibility */
   .focus-ring {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-accent-1/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base;
+    @apply focus:outline-none focus:ring-2 focus:ring-gold/60 focus:ring-offset-2 focus:ring-offset-stone;
   }
 }
 
-/* Lightweight inverted palette for the theme toggle. Bholu is designed
-   dark-first; this keeps light mode readable without a second design
-   system. */
-html.light body {
-  background-color: #F4F5F8;
-  color: #16181F;
+/* Subtle photograph overlay styling */
+.photo-cinematic {
+  position: relative;
+  overflow: hidden;
 }
-html.light .glass,
-html.light .glass-hi {
-  background-color: rgba(255, 255, 255, 0.75);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-html.light .text-ink-hi { color: #16181F; }
-html.light .text-ink-lo { color: #5B5F70; }
-html.light .bg-base { background-color: #F4F5F8; }
 
-@keyframes orb-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.45); }
-  50% { box-shadow: 0 0 0 8px rgba(124, 92, 252, 0); }
-}
-.orb-pulse {
-  animation: orb-pulse 2s ease-in-out infinite;
+.photo-cinematic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 35%, rgba(11, 15, 25, 0.85) 100%);
+  pointer-events: none;
 }
