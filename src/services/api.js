@@ -5,11 +5,28 @@
  */
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const rawApiUrl = import.meta.env.VITE_API_URL || "";
+const API_URL = rawApiUrl || "http://127.0.0.1:8000";
+
+/**
+ * Determines whether the frontend should attempt a live network call to the backend.
+ * Avoids browser Mixed-Content security blocks (calling http:// from https://).
+ */
+export const isLiveBackendAvailable = () => {
+  if (typeof window === "undefined") return false;
+  // If an HTTPS production backend URL is configured (e.g. Render), use it
+  if (rawApiUrl && rawApiUrl.startsWith("https://")) return true;
+  // If running locally in development (localhost / 127.0.0.1), use local backend
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return true;
+  }
+  // On a deployed HTTPS site with no HTTPS backend URL configured, don't attempt mixed-content HTTP
+  return false;
+};
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 4000,
+  timeout: 3000,
   headers: { "Content-Type": "application/json" },
 });
 

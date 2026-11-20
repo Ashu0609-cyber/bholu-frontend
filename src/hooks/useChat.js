@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { postChat, STREAM_URL } from "../services/api.js";
+import { postChat, STREAM_URL, isLiveBackendAvailable } from "../services/api.js";
 
 const SESSION_KEY = "bholu_session_id";
 
@@ -286,9 +286,12 @@ export function useChat() {
         );
       };
 
+      // Determine if a valid live backend is accessible from this environment
+      const shouldAttemptBackend = isLiveBackendAvailable();
+
       // 1. Try Server-Sent Events (SSE) streaming with a tight 2s timeout
       let backendSucceeded = false;
-      if (streamingEnabled && typeof EventSource !== "undefined") {
+      if (shouldAttemptBackend && streamingEnabled && typeof EventSource !== "undefined") {
         try {
           await streamViaSSE(trimmed, sessionIdRef.current, updateAssistant, eventSourceRef, 2000);
           backendSucceeded = true;
@@ -300,7 +303,7 @@ export function useChat() {
       }
 
       // 2. Try standard /chat POST if SSE didn't stream
-      if (!backendSucceeded) {
+      if (shouldAttemptBackend && !backendSucceeded) {
         try {
           const result = await postChat(trimmed, sessionIdRef.current);
           const cleanAnswer = sanitizeChatAnswer(result?.response || result?.answer || result);

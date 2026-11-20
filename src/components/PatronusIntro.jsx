@@ -72,9 +72,15 @@ export default function PatronusIntro({ onComplete }) {
     window.addEventListener("click", handleFirstGesture, { once: true });
     window.addEventListener("keydown", handleFirstGesture, { once: true });
 
+    // Safety timeout: auto-reveal portfolio after 15s in case video hangs
+    const safetyTimer = setTimeout(() => {
+      handleSkip();
+    }, 15000);
+
     return () => {
       window.removeEventListener("click", handleFirstGesture);
       window.removeEventListener("keydown", handleFirstGesture);
+      clearTimeout(safetyTimer);
     };
   }, []);
 
@@ -96,6 +102,10 @@ export default function PatronusIntro({ onComplete }) {
           src="/harry_expecto_patronum.mp4"
           playsInline
           preload="auto"
+          onError={() => {
+            console.warn("Video failed to load or play; transitioning to portfolio");
+            handleSkip();
+          }}
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleVideoEnded}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
