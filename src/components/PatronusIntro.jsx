@@ -99,7 +99,7 @@ export default function PatronusIntro({ onComplete }) {
         {/* Real Movie Clip Video */}
         <video
           ref={videoRef}
-          src="/harry_expecto_patronum.mp4"
+          src={`${import.meta.env.BASE_URL || "/"}harry_expecto_patronum.mp4`}
           playsInline
           preload="auto"
           onError={() => {

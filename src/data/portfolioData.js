@@ -14,7 +14,7 @@ export const PORTFOLIO_DATA = {
     phone: "+91 7058727787",
     linkedin: "https://www.linkedin.com/in/ashutosh-thakur-735673357",
     github: "https://github.com/Ashu0609-cyber",
-    resumePdf: "/resume.pdf",
+    resumePdf: `${import.meta.env.BASE_URL || "/"}resume.pdf`,
     summary:
       "Computer Science Engineering student at BMSIT&M with strong expertise in Generative AI, PyTorch, Transformers, Agentic Workflows, and RAG systems. Built a 124M-parameter GPT model from scratch, engineered scientific vision algorithms for microscopy reconstruction (StructureGuard), and developed low-latency retrieval pipelines. Top 2100 in Amazon ML Challenge 2024 among 89,000+ teams.",
     education: {
