@@ -3,7 +3,7 @@ import { FiMenu, FiX, FiDownload } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { PORTFOLIO_DATA } from "../data/portfolioData.js";
 
-export default function Navigation({ onOpenChat }) {
+export default function Navigation({ onOpenChat, onReplaySpell }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -69,7 +69,18 @@ export default function Navigation({ onOpenChat }) {
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5">
+            {onReplaySpell && (
+              <button
+                onClick={() => onReplaySpell()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-400/40 hover:border-cyan-300 text-cyan-200 hover:text-white text-xs font-cinzel tracking-wider uppercase transition-all shadow-[0_0_12px_rgba(56,189,248,0.25)] focus-ring group"
+                title="Cast Expecto Patronum spell"
+              >
+                <span className="text-cyan-300 group-hover:scale-125 transition-transform">⚡</span>
+                <span className="hidden md:inline">Expecto Patronum</span>
+              </button>
+            )}
+
             <button
               onClick={() => onOpenChat()}
               className="relative inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-chamber border border-gold/40 hover:border-gold hover:shadow-gold-glow-sm text-gold text-xs font-cinzel tracking-wider uppercase transition-all focus-ring group"

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Navigation from "./components/Navigation.jsx";
+import PatronusIntro from "./components/PatronusIntro.jsx";
 import GreatHall from "./sections/GreatHall.jsx";
 import TheWizard from "./sections/TheWizard.jsx";
 import Spellbook from "./sections/Spellbook.jsx";
@@ -12,6 +13,7 @@ import BholuWidget from "./components/BholuChatbot/BholuWidget.jsx";
 import { useChat } from "./hooks/useChat.js";
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState(null);
   const chatState = useChat();
@@ -23,8 +25,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone text-parchment relative selection:bg-gold/30 selection:text-gold-light">
+      {/* Hogwarts Expecto Patronum Opening Experience */}
+      {showIntro && <PatronusIntro onComplete={() => setShowIntro(false)} />}
+
       {/* Top Fixed Gothic Navigation */}
-      <Navigation onOpenChat={() => setChatOpen(true)} />
+      <Navigation
+        onOpenChat={() => setChatOpen(true)}
+        onReplaySpell={() => setShowIntro(true)}
+      />
 
       {/* Main Single-Page Portfolio Stream */}
       <main>
